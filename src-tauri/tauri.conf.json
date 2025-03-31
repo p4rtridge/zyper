@@ -14,9 +14,11 @@
     "windows": [
       {
         "title": "zyper",
+        "dragDropEnabled": true,
         "width": 800,
         "height": 600,
-        "dragDropEnabled": false
+        "minWidth": 192,
+        "minHeight": 192
       }
     ],
     "security": {

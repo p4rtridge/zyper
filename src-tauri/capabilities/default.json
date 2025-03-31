@@ -8,8 +8,9 @@
   "permissions": [
     "core:default",
     "opener:default",
-    "clipboard-manager:allow-read-text",
     "clipboard-manager:allow-write-text",
-    "fs:allow-read-file"
+    "fs:allow-read-file",
+    "os:allow-platform",
+    "dialog:allow-open"
   ]
 }
