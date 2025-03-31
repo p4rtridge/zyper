@@ -1,7 +1,19 @@
-import { Button } from "@/components/ui/button";
+// import { useCallback } from "react";
+
+import { listen } from "@tauri-apps/api/event";
+import { useEffect } from "react";
+//import DropZone from "@/components/dropzone";
 
 function App() {
-    return <Button>click me</Button>;
+    // const onFilesAccepted = useCallback((files: File[]) => {
+    //     if (!files.length) {
+    //         return;
+    //     }
+
+    //     console.log(files);
+    // }, []);
+
+    return <>{/* <DropZone onFilesAccepted={onFilesAccepted} /> */}</>;
 }
 
 export default App;

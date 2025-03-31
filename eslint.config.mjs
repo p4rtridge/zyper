@@ -82,7 +82,7 @@ export default [
         },
     },
     {
-        files: ["src/**/*.{ts,tsx,json,md}"],
+        files: ["src/**/*.{ts,tsx,md}"],
         plugins: { prettier: prettierPlugin },
         rules: { ...prettier.rules, "prettier/prettier": "error" },
     },
