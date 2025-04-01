@@ -28,16 +28,3 @@ export function splitString(str: string): string[] {
 
     return splitted;
 }
-
-/**
- * djb2 hash algorithm for file path
- */
-export function hash(str: string): string {
-    let hash = 564485; // try google it
-
-    for (let i = 0; i < str.length; i++) {
-        hash = (hash * 33) ^ str.charCodeAt(i);
-    }
-
-    return (hash >>> 0).toString();
-}

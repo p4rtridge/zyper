@@ -119,3 +119,24 @@
         @apply bg-background text-foreground;
     }
 }
+
+@layer utilities {
+    .scrollbar::-webkit-scrollbar {
+        @apply w-0.5;
+    }
+
+    .scrollbar:hover::-webkit-scrollbar-thumb {
+        @apply bg-input;
+    }
+
+    .scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-secondary rounded-xl transition-colors duration-200;
+    }
+
+    .scrollbar {
+        -ms-overflow-style: -ms-autohiding-scrollbar;
+        scrollbar-width: calc(var(--spacing) * 0.5);
+
+        @apply pr-1;
+    }
+}

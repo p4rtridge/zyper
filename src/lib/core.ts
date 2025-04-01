@@ -7,8 +7,8 @@ import { splitString } from "./utils";
 
 const decoder = new TextDecoder("utf-8");
 
-const getFileContent = cache((filePath: string): Promise<string> | null => {
-    const splittedStr = splitString(filePath);
+const processFile = cache((path: string): Promise<Translation> | null => {
+    const splittedStr = splitString(path);
 
     const fileName = splittedStr[splittedStr.length - 1];
     const fileExt = fileName.split(".").at(1);
@@ -17,9 +17,11 @@ const getFileContent = cache((filePath: string): Promise<string> | null => {
         return null;
     }
 
-    return invoke<ArrayBuffer>("read_file", { path: filePath }).then(
-        (contentBuf) => decoder.decode(contentBuf)
-    );
+    return invoke<ArrayBuffer>("process_file", { path }).then((buf) => {
+        const decoded = JSON.parse(decoder.decode(buf)) as Translation;
+
+        return decoded;
+    });
 });
 
-export { getFileContent };
+export { processFile };

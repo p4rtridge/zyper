@@ -1,6 +1,20 @@
 {
     "translation": {
+        "fileNotFoundError": "Không tìm thấy bản dịch.",
+        "permissionDeniedError": "Thiếu quyền: Không thể mở bản dịch.",
+        "internalError": "Lỗi ứng dụng: Có lỗi xảy ra.",
         "dialogName": "Bản dịch",
-        "dropFiles": "Thả bản dịch của bạn tại đây."
+        "dropFiles": "Thả bản dịch của bạn tại đây.",
+        "homepage": {
+            "greeting": "Xin chào, Editor!",
+            "introduction1": "App này sẽ giúp bạn type bản dịch nhanh hơn.",
+            "introduction2": "Bằng cách bỏ qua bước 'copy-paste' và vài bước khác.",
+            "useless": "Tóm gọn lại, nó vô dụng vãi!!!",
+            "explain1": "Nhưng tôi vẫn làm.",
+            "explain2": "Vì nó vui, tôi nghĩ thế.",
+            "explain3": "Còn giờ, bắt đầu nào.",
+            "guide1": "Để thêm bản dịch, ấn",
+            "guide2": "Hoặc kéo bản dịch của bạn vào đây"
+        }
     }
 }

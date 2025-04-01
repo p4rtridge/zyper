@@ -6,5 +6,5 @@ pub fn prepare_handlers<R>() -> impl Fn(Invoke<R>) -> bool + Send + Sync + 'stat
 where
     R: Runtime,
 {
-    tauri::generate_handler![parser::read_file]
+    tauri::generate_handler![parser::process_file, parser::remove_file]
 }

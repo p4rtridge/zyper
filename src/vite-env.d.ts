@@ -7,6 +7,8 @@ declare global {
     };
 
     type TauriResizeEvent = { height: number; width: number };
+
+    type Translation = { hash: string; file_name?: string };
 }
 
 export {};

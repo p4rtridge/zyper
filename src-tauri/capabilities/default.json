@@ -11,6 +11,7 @@
     "clipboard-manager:allow-write-text",
     "fs:allow-read-file",
     "os:allow-platform",
-    "dialog:allow-open"
+    "dialog:allow-open",
+    "dialog:allow-message"
   ]
 }

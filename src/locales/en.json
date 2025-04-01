@@ -1,6 +1,20 @@
 {
     "translation": {
+        "fileNotFoundError": "Target files not found.",
+        "permissionDeniedError": "Permission denied: Unable to open files.",
+        "internalError": "Internal error: Application failure.",
         "dialogName": "Translations",
-        "dropFiles": "Drop your translation files here."
+        "dropFiles": "Drop your translation files here.",
+        "homepage": {
+            "greeting": "Hello, Editor!",
+            "introduction1": "This app will help you type your translations faster.",
+            "introduction2": "By skipping the 'copy-paste' step and other unnecessary steps.",
+            "useless": "In summary, it's quite useless.",
+            "explain1": "But I still made it.",
+            "explain2": "For fun, I think.",
+            "explain3": "Now, let's try.",
+            "guide1": "To add translations, simply click",
+            "guide2": "Or just drag your translations here"
+        }
     }
 }
