@@ -18,6 +18,18 @@
             "explain3": "Now, let's try.",
             "guide1": "To add translations, simply click",
             "guide2": "Or just drag your translations here"
+        },
+        "settings": {
+            "theme": "Theme",
+            "themeHint": "Select your application theme",
+            "language": "Language",
+            "languageHint": "Select your application language",
+            "cacheCap": "Cache size",
+            "cacheCapHint": "Maximum number of translations can be cached. If this limit is exceeded, the oldest cached translation will be removed. Minimum size: 1. Maximum size: 128. Require restart to take effect",
+            "cacheTtl": "Cache TTL",
+            "cacheTtlHint": "Translations can remain cached for a maximum duration. They will be removed once they exceed this time limit. Minimum TTL: 1 minutes. Maximum TTL: 30 minutes. Require restart to take effect",
+            "detectPagination": "Pagination prefix",
+            "detectPaginationHint": "The prefix used to identify pagination in translations"
         }
     }
 }

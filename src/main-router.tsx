@@ -4,9 +4,11 @@ import { createBrowserRouter, redirect, RouterProvider } from "react-router";
 
 import "./main.css";
 import "./i18n";
-import About from "./About";
-import App from "./App";
-import Translation from "./Translation";
+
+import About from "./about";
+import App from "./app";
+import Provider from "./components/provider";
+import Translation from "./translation";
 
 const router = createBrowserRouter([
     { path: "/", element: <App /> },
@@ -30,6 +32,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <Provider>
+            <RouterProvider router={router} />
+        </Provider>
     </React.StrictMode>
 );

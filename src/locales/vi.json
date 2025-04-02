@@ -18,6 +18,18 @@
             "explain3": "Còn giờ, bắt đầu nào.",
             "guide1": "Để thêm bản dịch, ấn",
             "guide2": "Hoặc kéo bản dịch của bạn vào đây"
+        },
+        "settings": {
+            "theme": "Chủ đề",
+            "themeHint": "Lựa chọn chủ đề cho App",
+            "language": "Ngôn ngữ",
+            "languageHint": "Lựa chọn ngôn ngữ cho App",
+            "cacheCap": "Kích thước bộ nhớ đệm",
+            "cacheCapHint": "Số lượng bản dịch tối đa có thể nhớ. Nếu vượt quá mức chỉ định sẽ loại bỏ bản dịch cũ nhất khỏi bộ nhớ đệm (Phải đọc lại từ File dịch). Tối thiểu: 1. Tối đa: 128. Cần khởi động lại App để có hiệu lực",
+            "cacheTtl": "Cache TTL",
+            "cacheTtlHint": "Bản dịch được nhớ sẽ có tuổi thọ. Nếu vượt quá mức chỉ định sẽ loại bỏ bản dịch khỏi bộ nhớ đệm (Phải đọc lại từ File dịch). Tối thiểu: 1. Tối đa: 30. Cần khởi động lại App để có hiệu lực",
+            "detectPagination": "Tiền tố phân trang",
+            "detectPaginationHint": "Tiền tố dùng để phân trang trong bản dịch"
         }
     }
 }

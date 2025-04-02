@@ -7,9 +7,6 @@ license = "MIT"
 edition = "2024"
 
 [lib]
-# The `_lib` suffix may seem redundant but it is necessary
-# to make the lib name unique and wouldn't conflict with the bin name.
-# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
 name = "zyper_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
@@ -17,15 +14,15 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-bytes = "1.10.1"
+bytes = "1.10"
 moka = { version = "0.12", features = ["future"] }
 tauri = { version = "2.4", features = [] }
-tauri-plugin-clipboard-manager = "2"
-tauri-plugin-dialog = "2"
-tauri-plugin-fs = "2"
-tauri-plugin-opener = "2.2"
-tauri-plugin-os = "2"
-tokio = { version = "1.44.1", features = ["fs"] }
+tauri-plugin-clipboard-manager = "2.2"
+tauri-plugin-dialog = "2.2"
+tauri-plugin-fs = "2.2"
+tauri-plugin-os = "2.2"
+tauri-plugin-store = "2.2"
+tokio = { version = "1.44", features = ["fs"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sonic-rs = "0.4"
@@ -44,6 +41,7 @@ missing_panics_doc = "warn"
 needless_return = "warn"
 no_effect_underscore_binding = "warn"
 used_underscore_binding = "allow"
+needless_pass_by_value = "allow"
 
 [lints.rust]
 rust_2018_idioms = { level = "deny", priority = -1 }

@@ -59,4 +59,33 @@ const getFile = cache(
     }
 );
 
-export { processFile, getFile };
+const parseTranslation = cache((str: string, prefix: string) => {
+    const result = [];
+
+    let currentPage = null;
+    let currentParagraphs = [];
+
+    const lines = str.split("\n");
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+
+        if (trimmedLine.startsWith(prefix)) {
+            if (currentPage) {
+                result.push([currentPage, currentParagraphs]);
+                currentParagraphs = [];
+            }
+
+            currentPage = parseInt(trimmedLine.substring(2));
+        } else if (trimmedLine !== "") {
+            currentParagraphs.push(trimmedLine);
+        }
+    }
+
+    if (currentPage) {
+        result.push([currentPage, currentParagraphs]);
+    }
+
+    return result;
+});
+
+export { processFile, getFile, parseTranslation };

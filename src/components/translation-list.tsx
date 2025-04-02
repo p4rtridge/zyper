@@ -59,7 +59,7 @@ const TranslationList: React.FC<TranslationListProps> = ({
 
                     {!isCollapsed && (
                         <button
-                            className="text-chart-5 p-1 hover:cursor-pointer"
+                            className="text-destructive p-1 hover:cursor-pointer"
                             onClick={(e) =>
                                 removeTranslationHandler(e, translation.hash)
                             }>

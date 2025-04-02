@@ -11,6 +11,8 @@ where
         parser::process_file,
         parser::remove_file,
         parser::get_file,
-        settings::create_new_window
+        settings::create_new_window,
+        settings::get_settings,
+        settings::set_settings
     ]
 }

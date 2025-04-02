@@ -1,9 +1,8 @@
-use crate::{AppState, utils};
+use crate::{state::AppState, utils};
 use bytes::{BufMut, BytesMut};
 use serde::Serialize;
-use std::{io::ErrorKind, path::Path};
+use std::path::Path;
 use tauri::{State, ipc};
-use tokio::fs;
 
 #[derive(Debug, Serialize)]
 pub struct FileResult {
@@ -13,7 +12,7 @@ pub struct FileResult {
 
 #[tauri::command]
 pub async fn process_file(
-    app_state: State<'_, AppState>,
+    state: State<'_, AppState>,
     path: String,
 ) -> Result<ipc::Response, &'static str> {
     let hashed = utils::hash(&path);
@@ -23,31 +22,37 @@ pub async fn process_file(
         .file_name()
         .and_then(|str| str.to_str().map(String::from));
 
-    let content = match read_file_utf8(path).await {
-        Ok(content) => content,
-        Err(err) => return Err(err),
-    };
-
-    app_state.cache.insert(hashed.clone(), content).await;
-
     let file_result = FileResult {
-        hash: hashed,
+        hash: hashed.clone(),
         file_name,
     };
 
     let mut buf = BytesMut::with_capacity(128).writer();
-    match sonic_rs::to_writer(&mut buf, &file_result) {
-        Ok(()) => {
-            let bytes: Vec<u8> = buf.into_inner().freeze().into();
-
-            Ok(ipc::Response::new(bytes))
-        }
-        Err(err) => {
-            eprintln!("[Error] Serialize error: {err:?}");
-
-            Err("internalError")
-        }
+    if let Err(err) = sonic_rs::to_writer(&mut buf, &file_result) {
+        eprintln!("[Error] Serialize error: {err:?}");
+        return Err("internalError");
     }
+
+    let out: Vec<u8> = buf.into_inner().freeze().into();
+
+    if state.cache.contains_key(&hashed) {
+        return Ok(ipc::Response::new(out));
+    }
+
+    let _lock = state.read_lock.lock().await;
+
+    if state.cache.contains_key(&hashed) {
+        return Ok(ipc::Response::new(out));
+    }
+
+    let content = match utils::read_file_utf8(path).await {
+        Ok(content) => content,
+        Err(err) => return Err(err),
+    };
+
+    state.cache.insert(hashed, content).await;
+
+    Ok(ipc::Response::new(out))
 }
 
 #[tauri::command]
@@ -66,10 +71,16 @@ pub async fn get_file(
     hash: String,
     path: String,
 ) -> Result<ipc::Response, &'static str> {
+    if let Some(content) = state.cache.get(&hash).await {
+        return Ok(ipc::Response::new(content));
+    }
+
+    let _lock = state.read_lock.lock().await;
+
     let content = if let Some(content) = state.cache.get(&hash).await {
         content
     } else {
-        let content = match read_file_utf8(&path).await {
+        let content = match utils::read_file_utf8(&path).await {
             Ok(content) => content,
             Err(err) => return Err(err),
         };
@@ -80,19 +91,4 @@ pub async fn get_file(
     };
 
     Ok(ipc::Response::new(content))
-}
-
-async fn read_file_utf8(path: impl AsRef<Path>) -> Result<Vec<u8>, &'static str> {
-    match fs::read(path).await {
-        Ok(content) => Ok(content),
-        Err(err) => match err.kind() {
-            ErrorKind::NotFound => Err("fileNotFoundError"),
-            ErrorKind::PermissionDenied => Err("permissionDeniedError"),
-            _ => {
-                eprintln!("[Error] Read file error: {err:?}");
-
-                Err("internalError")
-            }
-        },
-    }
 }

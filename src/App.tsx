@@ -16,7 +16,6 @@ function App() {
         }, 10000);
 
         const previousSession = localStorage.getItem("previous_session");
-
         if (!previousSession) {
             return;
         }

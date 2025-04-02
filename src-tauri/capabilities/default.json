@@ -7,11 +7,11 @@
   ],
   "permissions": [
     "core:default",
-    "opener:default",
     "clipboard-manager:allow-write-text",
     "fs:allow-read-file",
     "os:allow-platform",
     "dialog:allow-open",
-    "dialog:allow-message"
+    "dialog:allow-message",
+    "store:default"
   ]
 }
