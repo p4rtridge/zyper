@@ -1,4 +1,3 @@
-import { message } from "@tauri-apps/plugin-dialog";
 import { motion } from "motion/react";
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -18,24 +17,16 @@ const DropZone: React.FC = (): React.JSX.Element => {
         }
 
         drops.paths.forEach(async (path) => {
-            try {
-                const response = await processFile(path);
-                if (!response) {
-                    return;
-                }
-
-                addTranslation({
-                    hash: response.hash,
-                    file_name: response.file_name,
-                    path,
-                });
-            } catch (error) {
-                if (typeof error === "string") {
-                    await message(t(error), { kind: "error" });
-                }
-
-                console.error("Uncaught error: ", error);
+            const response = await processFile(path);
+            if (!response) {
+                return;
             }
+
+            addTranslation({
+                hash: response.hash,
+                file_name: response.file_name,
+                path,
+            });
         });
     }, [drops, addTranslation, t]);
 

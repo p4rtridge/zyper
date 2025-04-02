@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { Link } from "react-router";
 import { useShallow } from "zustand/react/shallow";
 
+import { cn } from "@/lib/utils";
 import useTranslationStore from "@/stores/translation";
 
 type TranslationListProps = { isCollapsed: boolean };
@@ -10,13 +11,14 @@ type TranslationListProps = { isCollapsed: boolean };
 const TranslationList: React.FC<TranslationListProps> = ({
     isCollapsed,
 }: TranslationListProps) => {
-    const [translations, removeTranslation] = useTranslationStore(
-        useShallow((state) => [state.translations, state.removeTranslation])
-    );
-
-    if (isCollapsed) {
-        return null;
-    }
+    const [translations, currentTranslation, removeTranslation] =
+        useTranslationStore(
+            useShallow((state) => [
+                state.translations,
+                state.getCurrentTranslation,
+                state.removeTranslation,
+            ])
+        );
 
     const removeTranslationHandler = (
         e: React.MouseEvent<HTMLButtonElement>,
@@ -40,20 +42,30 @@ const TranslationList: React.FC<TranslationListProps> = ({
                 <motion.li
                     key={translation.hash}
                     variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }}
-                    className="bg-card flex items-center gap-x-1 rounded-md">
+                    className={cn(
+                        "bg-card flex items-center gap-x-1 rounded-sm transition-colors duration-200",
+                        currentTranslation()?.hash == translation.hash
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-ring/25 hover:text-foreground"
+                    )}>
                     <Link
-                        to={`translations/${translation.hash}`}
-                        className="block w-full overflow-hidden p-1 py-2 text-xs">
-                        {translation.file_name ?? ""}
+                        to={`/translations/${translation.hash}`}
+                        className={cn(
+                            "block w-full overflow-hidden p-1 py-2 text-xs",
+                            isCollapsed && "p-2.5"
+                        )}>
+                        {!isCollapsed && (translation.file_name ?? "")}
                     </Link>
 
-                    <button
-                        className="text-chart-5 p-1 hover:cursor-pointer"
-                        onClick={(e) =>
-                            removeTranslationHandler(e, translation.hash)
-                        }>
-                        <X className="h-5 w-5" />
-                    </button>
+                    {!isCollapsed && (
+                        <button
+                            className="text-chart-5 p-1 hover:cursor-pointer"
+                            onClick={(e) =>
+                                removeTranslationHandler(e, translation.hash)
+                            }>
+                            <X className="h-5 w-5" />
+                        </button>
+                    )}
                 </motion.li>
             ))}
         </motion.ul>

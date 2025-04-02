@@ -23,17 +23,9 @@ pub async fn process_file(
         .file_name()
         .and_then(|str| str.to_str().map(String::from));
 
-    let content = match fs::read(path).await {
+    let content = match read_file_utf8(path).await {
         Ok(content) => content,
-        Err(err) => match err.kind() {
-            ErrorKind::NotFound => return Err("fileNotFoundError"),
-            ErrorKind::PermissionDenied => return Err("permissionDeniedError"),
-            _ => {
-                eprintln!("[Error] Read file error: {err:?}");
-
-                return Err("internalError");
-            }
-        },
+        Err(err) => return Err(err),
     };
 
     app_state.cache.insert(hashed.clone(), content).await;
@@ -66,4 +58,41 @@ pub async fn remove_file(
     state.cache.invalidate(&hash).await;
 
     Ok("ok")
+}
+
+#[tauri::command]
+pub async fn get_file(
+    state: State<'_, AppState>,
+    hash: String,
+    path: String,
+) -> Result<ipc::Response, &'static str> {
+    let content = if let Some(content) = state.cache.get(&hash).await {
+        content
+    } else {
+        let content = match read_file_utf8(&path).await {
+            Ok(content) => content,
+            Err(err) => return Err(err),
+        };
+
+        state.cache.insert(hash, content.clone()).await;
+
+        content
+    };
+
+    Ok(ipc::Response::new(content))
+}
+
+async fn read_file_utf8(path: impl AsRef<Path>) -> Result<Vec<u8>, &'static str> {
+    match fs::read(path).await {
+        Ok(content) => Ok(content),
+        Err(err) => match err.kind() {
+            ErrorKind::NotFound => Err("fileNotFoundError"),
+            ErrorKind::PermissionDenied => Err("permissionDeniedError"),
+            _ => {
+                eprintln!("[Error] Read file error: {err:?}");
+
+                Err("internalError")
+            }
+        },
+    }
 }

@@ -136,7 +136,5 @@
     .scrollbar {
         -ms-overflow-style: -ms-autohiding-scrollbar;
         scrollbar-width: calc(var(--spacing) * 0.5);
-
-        @apply pr-1;
     }
 }

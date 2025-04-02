@@ -3,8 +3,11 @@
         "fileNotFoundError": "Target files not found.",
         "permissionDeniedError": "Permission denied: Unable to open files.",
         "internalError": "Internal error: Application failure.",
+        "existedWindowError": "Windows already exists.",
         "dialogName": "Translations",
         "dropFiles": "Drop your translation files here.",
+        "hintLabel": "Need help?",
+        "hintText": "Click here",
         "homepage": {
             "greeting": "Hello, Editor!",
             "introduction1": "This app will help you type your translations faster.",

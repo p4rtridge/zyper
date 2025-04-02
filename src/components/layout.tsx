@@ -27,6 +27,7 @@ const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
     const minSizePercentage = Math.floor(
         (MIN_SIZE_PANEL_IN_PIXEL / size.width) * 100
     );
+    const navBarSizePercentage = Math.floor((60 / size.width) * 100);
 
     const [rightSize, setRightSize] = useState(() => {
         const resizableSize = localStorage.getItem(
@@ -56,15 +57,17 @@ const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
         if (!isCollapsed) {
             rightPanelRef.current.collapse();
         } else {
-            rightPanelRef.current.expand();
+            rightPanelRef.current.resize(50);
         }
 
         setIsCollapsed(!isCollapsed);
     };
 
     useEffect(() => {
-        setIsCollapsed(6 + minSizePercentage > debouncedRightSize);
-    }, [minSizePercentage, debouncedRightSize]);
+        setIsCollapsed(
+            navBarSizePercentage + minSizePercentage > debouncedRightSize
+        );
+    }, [debouncedRightSize, minSizePercentage, navBarSizePercentage]);
 
     return (
         <>

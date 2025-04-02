@@ -3,8 +3,11 @@
         "fileNotFoundError": "Không tìm thấy bản dịch.",
         "permissionDeniedError": "Thiếu quyền: Không thể mở bản dịch.",
         "internalError": "Lỗi ứng dụng: Có lỗi xảy ra.",
+        "existedWindowError": "Bạn đang mở một window khác.",
         "dialogName": "Bản dịch",
         "dropFiles": "Thả bản dịch của bạn tại đây.",
+        "hintLabel": "Cần giúp đỡ?",
+        "hintText": "Bấm vào đây",
         "homepage": {
             "greeting": "Xin chào, Editor!",
             "introduction1": "App này sẽ giúp bạn type bản dịch nhanh hơn.",

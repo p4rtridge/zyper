@@ -1,80 +1,46 @@
-import { CirclePlus } from "lucide-react";
-import { AnimatePresence, motion, Variants } from "motion/react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link, useNavigate } from "react-router";
 
 import Layout from "./components/layout";
-import { cn } from "./lib/utils";
-
-const textOrder = [
-    "greeting",
-    "introduction1",
-    "introduction2",
-    "useless",
-    "explain1",
-    "explain2",
-    "explain3",
-    "guide1",
-    "guide2",
-];
+import { Button } from "./components/ui/button";
 
 function App() {
     const { t } = useTranslation();
-    const [currentIdx, setCurrentIdx] = useState(0);
-    const reachEnd = currentIdx === textOrder.length - 2;
-
-    const variants: Variants = {
-        enter: { opacity: 0 },
-        show: { opacity: 1 },
-        exit: { opacity: 0 },
-    };
+    const navigate = useNavigate();
+    const [hintEnabled, setHintEnabled] = useState(false);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
-            const nextIndex = currentIdx + 1;
+            setHintEnabled(true);
+        }, 10000);
 
-            if (nextIndex < textOrder.length - 1) {
-                setCurrentIdx(nextIndex);
-            }
-        }, 5000);
+        const previousSession = localStorage.getItem("previous_session");
+
+        if (!previousSession) {
+            return;
+        }
+
+        navigate(`/translations/${previousSession}`);
 
         return () => {
             clearTimeout(timeout);
         };
-    }, [currentIdx]);
-
-    let renderedText;
-    if (reachEnd) {
-        renderedText = (
-            <>
-                <p>
-                    {t(`homepage.${textOrder[currentIdx]}`)}
-                    <CirclePlus className="mx-1 inline h-5 w-5" />
-                </p>
-                <p>{t(`homepage.${textOrder[currentIdx + 1]}`)}</p>
-            </>
-        );
-    } else {
-        renderedText = <>{t(`homepage.${textOrder[currentIdx]}`)}</>;
-    }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <Layout>
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={currentIdx}
-                    variants={variants}
-                    initial="enter"
-                    animate="show"
-                    exit="exit"
-                    transition={{ duration: 0.5 }}
-                    className={cn(
-                        "flex h-dvh items-center justify-center p-1.5 text-center",
-                        reachEnd && "flex-col gap-y-2"
-                    )}>
-                    {renderedText}
-                </motion.div>
-            </AnimatePresence>
+            {hintEnabled && (
+                <div className="flex h-dvh flex-col items-center justify-center gap-2">
+                    <p className="px-4">{t("hintLabel")}</p>
+                    <Button
+                        variant="link"
+                        asChild>
+                        <Link to="/translations">{t("hintText")}</Link>
+                    </Button>
+                </div>
+            )}
         </Layout>
     );
 }
