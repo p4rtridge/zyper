@@ -5,6 +5,9 @@
 
 Simple typing tool that helps you type your translations faster by reducing the 'copy-paste' process on macOS, Windows and Linux (X11).
 
+## Demo
+
+
 ## Supported Document Formats
 
 - TXT
