@@ -1,19 +1,20 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "zyper",
-  "version": "0.1.0",
+  "productName": "Zyper",
+  "version": "1.0.0",
   "identifier": "com.zyper.app",
   "build": {
     "beforeDevCommand": "bun run dev:fe",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "bun run build",
+    "beforeBuildCommand": "bun run build:fe",
     "frontendDist": "../dist"
   },
   "app": {
     "withGlobalTauri": false,
     "windows": [
       {
-        "title": "zyper",
+        "title": "Zyper",
+        "label": "zyper_main_window",
         "dragDropEnabled": true,
         "minHeight": 192,
         "minWidth": 192,
@@ -22,6 +23,7 @@
       }
     ],
     "security": {
+      "capabilities": ["desktop-capability"],
       "csp": null
     }
   },
@@ -29,11 +31,17 @@
     "active": true,
     "targets": "all",
     "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
+      "icons/logo32x32.png",
+      "icons/logo128x128.png",
+      "icons/logo256x256.png",
+      "icons/logo.ico"
+    ],
+    "windows": {
+      "allowDowngrades": true,
+      "webviewInstallMode": {
+        "silent": true,
+        "type": "embedBootstrapper"
+      }
+    }
   }
 }

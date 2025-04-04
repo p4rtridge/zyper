@@ -39,11 +39,11 @@ const processFile = cache(async (path: string): Promise<Translation | null> => {
 });
 
 const getFile = cache(
-    async (hash: string, path: string): Promise<string | null> => {
+    async (hash: string, path: string): Promise<ParsedTranslation[] | null> => {
         try {
             const buf = await invoke<ArrayBuffer>("get_file", { hash, path });
 
-            return decoder.decode(buf);
+            return JSON.parse(decoder.decode(buf)) as ParsedTranslation[];
         } catch (error) {
             if (typeof error === "string") {
                 const { t } = useTranslation();
@@ -53,39 +53,13 @@ const getFile = cache(
             }
 
             console.error("Uncaught error: ", error);
-
             return null;
         }
     }
 );
 
-const parseTranslation = cache((str: string, prefix: string) => {
-    const result = [];
+const writeToClipboardAndMacro = async (line: string) => {
+    await invoke("send_key_events", { line });
+};
 
-    let currentPage = null;
-    let currentParagraphs = [];
-
-    const lines = str.split("\n");
-    for (const line of lines) {
-        const trimmedLine = line.trim();
-
-        if (trimmedLine.startsWith(prefix)) {
-            if (currentPage) {
-                result.push([currentPage, currentParagraphs]);
-                currentParagraphs = [];
-            }
-
-            currentPage = parseInt(trimmedLine.substring(2));
-        } else if (trimmedLine !== "") {
-            currentParagraphs.push(trimmedLine);
-        }
-    }
-
-    if (currentPage) {
-        result.push([currentPage, currentParagraphs]);
-    }
-
-    return result;
-});
-
-export { processFile, getFile, parseTranslation };
+export { processFile, getFile, writeToClipboardAndMacro };

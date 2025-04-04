@@ -1,26 +1,77 @@
 import { motion } from "motion/react";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { redirect, useLoaderData } from "react-router";
 
 import Layout from "./components/layout";
-import { getFile, parseTranslation } from "./lib/core";
+import { TriggerEvent, useTrigger } from "./hooks/trigger";
+import { getFile, writeToClipboardAndMacro } from "./lib/core";
 import { cn } from "./lib/utils";
 import useSettingsStore from "./stores/settings";
 import useTranslationStore from "./stores/translation";
 
+const getKey = (index: number) => {
+    return `paragraph_${index}`;
+};
+
 const Translation: React.FC = () => {
     const { translationId } = useLoaderData();
+    const { t } = useTranslation();
 
     const targetTranslation = useTranslationStore((state) =>
         state.getTranslation(translationId)
     );
     const settings = useSettingsStore((state) => state.settings);
 
-    const [content, setContent] = useState<string | null>(null);
-    const [current, setCurrent] = useState<string | null>(null);
+    const lineRefs = useRef<{ [key: number]: HTMLTableRowElement | null }>({});
+
+    const [content, setContent] = useState<ParsedTranslation[] | null>(null);
+    const [current, setCurrent] = useState<number | null>(null);
+
+    useTrigger((event) => {
+        // hah, javascript
+        if ((typeof current === "object" && current === null) || !content) {
+            return;
+        }
+
+        writeToClipboardAndMacro(content[current].content)
+            .then(() => {
+                let nextCurrent = null;
+
+                if (event === TriggerEvent.NextLine) {
+                    const next = current + 1;
+
+                    if (next < content.length) {
+                        nextCurrent = next;
+                        setCurrent(next);
+                    }
+                }
+
+                if (event === TriggerEvent.PrevLine) {
+                    const prev = current - 1;
+
+                    if (prev >= 0) {
+                        nextCurrent = prev;
+                        setCurrent(prev);
+                    }
+                }
+
+                if (nextCurrent) {
+                    lineRefs.current[nextCurrent]?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                    });
+                }
+            })
+            .catch(async () => {
+                const { message } = await import("@tauri-apps/plugin-dialog");
+
+                await message(t("macroError"), { kind: "error" });
+            });
+    });
 
     useEffect(() => {
-        if (!targetTranslation) {
+        if (!targetTranslation || !settings?.detect_pagination) {
             redirect("/");
 
             return;
@@ -29,74 +80,87 @@ const Translation: React.FC = () => {
         localStorage.setItem("previous_session", targetTranslation.hash);
 
         getFile(targetTranslation.hash, targetTranslation.path).then(
-            (content) => setContent(content)
-        );
-    }, [targetTranslation]);
+            (content) => {
+                if (!content) {
+                    return;
+                }
 
-    if (!content || !settings) {
+                setContent(content);
+                setCurrent(0);
+            }
+        );
+    }, [settings?.detect_pagination, targetTranslation]);
+
+    const changeParagraphHandler = (
+        e: React.MouseEvent<HTMLElement>,
+        index: number
+    ) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        setCurrent(index);
+    };
+
+    if (!content) {
         return <Layout />;
     }
 
     return (
         <Layout>
-            <motion.article
-                variants={{
-                    hidden: { opacity: 0 },
-                    show: { opacity: 1, transition: { staggerChildren: 0.05 } },
-                }}
-                initial="hidden"
-                animate="show"
-                className="scrollbar h-dvh overflow-x-hidden overflow-y-scroll text-sm">
-                {parseTranslation(content, settings.detect_pagination).map(
-                    ([page, paragraphs], index) => (
-                        <Fragment key={`page-${page}-${index}`}>
-                            <motion.div
+            <article className="scrollbar h-dvh overflow-x-hidden overflow-y-scroll text-sm">
+                <table className="table-fixed text-xs md:text-sm [&_tr>td:first-child]:text-end [&_tr>td:first-child]:align-top">
+                    <motion.tbody
+                        variants={{
+                            hidden: { opacity: 0 },
+                            show: {
+                                opacity: 1,
+                                transition: { staggerChildren: 0.02 },
+                            },
+                        }}
+                        initial="hidden"
+                        animate="show">
+                        {content.map((line, index) => (
+                            <motion.tr
+                                key={getKey(index)}
+                                ref={(ref) => {
+                                    lineRefs.current[index] = ref;
+                                }}
                                 variants={{
-                                    hidden: { opacity: 0.5, translateX: -999 },
+                                    hidden: { opacity: 0, translateX: -999 },
                                     show: { opacity: 1, translateX: 0 },
                                 }}
                                 transition={{ type: "tween" }}>
-                                {(paragraphs as string[]).map(
-                                    (paragraph, idx, arr) => (
-                                        <div
-                                            key={`paragraph-${idx}`}
-                                            className={cn(
-                                                "grid grid-cols-[40px_1fr] items-start transition-colors hover:cursor-pointer",
-                                                current == `${index}:${idx}`
-                                                    ? "bg-muted"
-                                                    : "hover:bg-input/50"
-                                            )}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-
-                                                setCurrent(`${index}:${idx}`);
-                                            }}>
-                                            <p
-                                                className={cn(
-                                                    "text-center opacity-0",
-                                                    current ===
-                                                        `${index}:${idx}` &&
-                                                        "opacity-100"
-                                                )}>
-                                                {page}:{idx + 1}
-                                            </p>
-                                            <p
-                                                className={cn(
-                                                    "border-muted border-l-[1px] py-0.5 pl-1",
-                                                    idx === arr.length - 1 &&
-                                                        "border-b-[1px]"
-                                                )}>
-                                                {paragraph}
-                                            </p>
-                                        </div>
-                                    )
-                                )}
-                            </motion.div>
-                        </Fragment>
-                    )
-                )}
-            </motion.article>
+                                <td
+                                    className={cn(
+                                        "max-w-11 truncate border-r-[1px] px-1 hover:cursor-default md:max-w-13 md:border-r-2",
+                                        current === index
+                                            ? "opacity-100"
+                                            : "opacity-30"
+                                    )}
+                                    onClick={(e) =>
+                                        changeParagraphHandler(e, index)
+                                    }>
+                                    {line.page ?? "??"}:{line.index}
+                                </td>
+                                <td className="w-full pb-1.5">
+                                    <p
+                                        className={cn(
+                                            "pl-1 hover:cursor-pointer",
+                                            current === index
+                                                ? "bg-card"
+                                                : "hover:bg-input/50"
+                                        )}
+                                        onClick={(e) =>
+                                            changeParagraphHandler(e, index)
+                                        }>
+                                        {line.content}
+                                    </p>
+                                </td>
+                            </motion.tr>
+                        ))}
+                    </motion.tbody>
+                </table>
+            </article>
         </Layout>
     );
 };

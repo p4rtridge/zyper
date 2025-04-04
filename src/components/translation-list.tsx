@@ -52,7 +52,7 @@ const TranslationList: React.FC<TranslationListProps> = ({
                         to={`/translations/${translation.hash}`}
                         className={cn(
                             "block w-full overflow-hidden p-1 py-2 text-xs",
-                            isCollapsed && "p-2.5"
+                            isCollapsed && "p-2.5 lg:p-3.5"
                         )}>
                         {!isCollapsed && (translation.file_name ?? "")}
                     </Link>

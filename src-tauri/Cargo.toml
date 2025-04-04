@@ -1,6 +1,6 @@
 [package]
 name = "zyper"
-version = "0.1.0"
+version = "1.0.0"
 description = "Zyper is a typing tool that helps you type your manga translation faster by reducing the \"copy-paste\" process."
 authors = ["Partridge <anhduc130703@gmail.com>"]
 license = "MIT"
@@ -10,12 +10,25 @@ edition = "2024"
 name = "zyper_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
+[profile.release]
+incremental = false
+codegen-units = 1
+debug = false
+lto = "fat"
+opt-level = 3
+panic = "abort"
+strip = true
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
+arc-swap = "1.7"
 bytes = "1.10"
+libmimalloc-sys = { version = "0.1.41", features = ["extended"] }
 moka = { version = "0.12", features = ["future"] }
+mimalloc = "0.1.45"
+rdev = { version = "0.5", features = ["serialize", "unstable_grab"] }
 tauri = { version = "2.4", features = [] }
 tauri-plugin-clipboard-manager = "2.2"
 tauri-plugin-dialog = "2.2"
@@ -25,7 +38,6 @@ tauri-plugin-store = "2.2"
 tokio = { version = "1.44", features = ["fs"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-sonic-rs = "0.4"
 
 [lints.clippy]
 all = { level = "warn", priority = -1 }
@@ -46,4 +58,4 @@ needless_pass_by_value = "allow"
 [lints.rust]
 rust_2018_idioms = { level = "deny", priority = -1 }
 unexpected_cfgs = { level = "warn" }
-unsafe_code = "forbid"
+unsafe_code = "warn"

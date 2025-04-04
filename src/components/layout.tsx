@@ -25,9 +25,19 @@ const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
 
     const { size } = useResize();
     const minSizePercentage = Math.floor(
-        (MIN_SIZE_PANEL_IN_PIXEL / size.width) * 100
+        ((size.width < 300
+            ? MIN_SIZE_PANEL_IN_PIXEL
+            : MIN_SIZE_PANEL_IN_PIXEL * 1.4) /
+            size.width) *
+            100
     );
-    const navBarSizePercentage = Math.floor((60 / size.width) * 100);
+    const navBarSizePercentage = Math.floor(
+        ((size.width < 300
+            ? MIN_SIZE_PANEL_IN_PIXEL * 2.5
+            : MIN_SIZE_PANEL_IN_PIXEL * 3.5) /
+            size.width) *
+            100
+    );
 
     const [rightSize, setRightSize] = useState(() => {
         const resizableSize = localStorage.getItem(
@@ -94,17 +104,17 @@ const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
                     className="relative flex flex-col">
                     <div
                         className={cn(
-                            "flex gap-2 border-b-2 p-2",
+                            "flex gap-1 border-b-2 p-2 lg:gap-2",
                             isCollapsed
                                 ? "flex-col items-center"
                                 : "items-start justify-between"
                         )}>
                         <motion.button
                             animate={{ rotate: isCollapsed ? 0 : 180 }}
-                            transition={{ duration: 0.3 }}
+                            transition={{ duration: 0.2 }}
                             onClick={handleCollapse}
                             className="text-card-foreground hover:cursor-pointer">
-                            <PanelLeftClose className="h-5 w-5" />
+                            <PanelLeftClose className="h-5 w-5 lg:h-7 lg:w-7" />
                         </motion.button>
                         <NavBar />
                     </div>

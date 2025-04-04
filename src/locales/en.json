@@ -4,6 +4,7 @@
         "permissionDeniedError": "Permission denied: Unable to open files.",
         "internalError": "Internal error: Application failure.",
         "existedWindowError": "Windows already exists.",
+        "macroError": "Failed to send key events",
         "dialogName": "Translations",
         "dropFiles": "Drop your translation files here.",
         "hintLabel": "Need help?",
@@ -21,15 +22,17 @@
         },
         "settings": {
             "theme": "Theme",
-            "themeHint": "Select your application theme",
             "language": "Language",
-            "languageHint": "Select your application language",
             "cacheCap": "Cache size",
-            "cacheCapHint": "Maximum number of translations can be cached. If this limit is exceeded, the oldest cached translation will be removed. Minimum size: 1. Maximum size: 128. Require restart to take effect",
+            "cacheCapHint": "Maximum number of translations that can be cached in RAM to avoid reloading the translation file. Minimum: 1. Maximum: 128. Requires app restart to take effect",
             "cacheTtl": "Cache TTL",
-            "cacheTtlHint": "Translations can remain cached for a maximum duration. They will be removed once they exceed this time limit. Minimum TTL: 1 minutes. Maximum TTL: 30 minutes. Require restart to take effect",
+            "cacheTtlHint": "Translations cached in RAM have a lifespan. If a translation exists for more than X minutes, it will be removed from RAM, and subsequent access will load it from the translation file. Minimum: 1. Maximum: 30. Requires app restart to take effect",
             "detectPagination": "Pagination prefix",
-            "detectPaginationHint": "The prefix used to identify pagination in translations"
+            "detectPaginationHint": "Prefix used for pagination in translations. Sentences on each page are separated based on this. Changing this will clear all cached translations",
+            "interceptInput": "Intercept keyboard input",
+            "interceptInputHint": "Intercept keyboard events before they are delivered to applications. This feature is unstable and may not work as expected. Requires app restart to take effect",
+            "nextParagraphShortcut": "Next line shortcut",
+            "prevParagraphShortcut": "Previous line shortcut"
         }
     }
 }

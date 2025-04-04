@@ -1,12 +1,14 @@
 import { motion } from "motion/react";
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 
 import { useDropZone } from "@/hooks/dropzone";
 import { processFile } from "@/lib/core";
 import useTranslationStore from "@/stores/translation";
 
 const DropZone: React.FC = (): React.JSX.Element => {
+    const navigate = useNavigate();
     const { t } = useTranslation();
     const { dragIn, drops } = useDropZone();
     const addTranslation = useTranslationStore((state) => state.addTranslation);
@@ -16,7 +18,7 @@ const DropZone: React.FC = (): React.JSX.Element => {
             return;
         }
 
-        drops.paths.forEach(async (path) => {
+        drops.paths.forEach(async (path, index, arr) => {
             const response = await processFile(path);
             if (!response) {
                 return;
@@ -27,8 +29,12 @@ const DropZone: React.FC = (): React.JSX.Element => {
                 file_name: response.file_name,
                 path,
             });
+
+            if (index === arr.length - 1) {
+                navigate(`/translations/${response.hash}`);
+            }
         });
-    }, [drops, addTranslation, t]);
+    }, [drops, addTranslation, navigate]);
 
     return (
         <>

@@ -9,4 +9,5 @@ i18n.use(initReactI18next).init({
     fallbackLng: "en",
     lng: localStorage.language,
     resources: { en: enJson, vi: viJson },
+    interpolation: { escapeValue: false },
 });

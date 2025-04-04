@@ -6,13 +6,26 @@ import useSettingsStore from "@/stores/settings";
 type ProviderProps = { children: React.ReactNode };
 
 const Provider: React.FC<ProviderProps> = ({ children }: ProviderProps) => {
-    //const { i18n } = useTranslation();
     const fetchSettings = useSettingsStore((state) => state.fetchSettings);
 
     useEffect(() => {
         fetchSettings();
+    }, [fetchSettings]);
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        const contextMenuHandler = (e: MouseEvent) => {
+            e.preventDefault();
+
+            return false;
+        };
+
+        window.addEventListener("contextmenu", contextMenuHandler, {
+            capture: true,
+        });
+
+        return () => {
+            window.removeEventListener("contextmenu", contextMenuHandler);
+        };
     }, []);
 
     return (

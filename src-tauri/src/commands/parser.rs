@@ -1,5 +1,4 @@
 use crate::{state::AppState, utils};
-use bytes::{BufMut, BytesMut};
 use serde::Serialize;
 use std::path::Path;
 use tauri::{State, ipc};
@@ -10,11 +9,18 @@ pub struct FileResult {
     pub file_name: Option<String>,
 }
 
+#[derive(Clone, Debug, Serialize)]
+pub struct ParsedFile {
+    pub page: Option<String>,
+    pub content: String,
+    pub index: u32,
+}
+
 #[tauri::command]
 pub async fn process_file(
     state: State<'_, AppState>,
     path: String,
-) -> Result<ipc::Response, &'static str> {
+) -> Result<ipc::Response, String> {
     let hashed = utils::hash(&path);
     let path = Path::new(&path);
 
@@ -27,13 +33,10 @@ pub async fn process_file(
         file_name,
     };
 
-    let mut buf = BytesMut::with_capacity(128).writer();
-    if let Err(err) = sonic_rs::to_writer(&mut buf, &file_result) {
-        eprintln!("[Error] Serialize error: {err:?}");
-        return Err("internalError");
-    }
-
-    let out: Vec<u8> = buf.into_inner().freeze().into();
+    let out = match utils::serialize_simd(&file_result) {
+        Ok(out) => out,
+        Err(err) => return Err(err),
+    };
 
     if state.cache.contains_key(&hashed) {
         return Ok(ipc::Response::new(out));
@@ -45,10 +48,7 @@ pub async fn process_file(
         return Ok(ipc::Response::new(out));
     }
 
-    let content = match utils::read_file_utf8(path).await {
-        Ok(content) => content,
-        Err(err) => return Err(err),
-    };
+    let content = utils::read_and_parse_file(path).await?;
 
     state.cache.insert(hashed, content).await;
 
@@ -66,13 +66,25 @@ pub async fn remove_file(
 }
 
 #[tauri::command]
+pub async fn flush_cache(state: State<'_, AppState>) -> Result<&'static str, &'static str> {
+    state.cache.invalidate_all();
+
+    Ok("ok")
+}
+
+#[tauri::command]
 pub async fn get_file(
     state: State<'_, AppState>,
     hash: String,
     path: String,
-) -> Result<ipc::Response, &'static str> {
+) -> Result<ipc::Response, String> {
     if let Some(content) = state.cache.get(&hash).await {
-        return Ok(ipc::Response::new(content));
+        let out = match utils::serialize_simd(&content) {
+            Ok(out) => out,
+            Err(err) => return Err(err),
+        };
+
+        return Ok(ipc::Response::new(out));
     }
 
     let _lock = state.read_lock.lock().await;
@@ -80,15 +92,14 @@ pub async fn get_file(
     let content = if let Some(content) = state.cache.get(&hash).await {
         content
     } else {
-        let content = match utils::read_file_utf8(&path).await {
-            Ok(content) => content,
-            Err(err) => return Err(err),
-        };
+        let content = utils::read_and_parse_file(&path).await?;
 
         state.cache.insert(hash, content.clone()).await;
 
         content
     };
 
-    Ok(ipc::Response::new(content))
+    let out = utils::serialize_simd(&content)?;
+
+    Ok(ipc::Response::new(out))
 }

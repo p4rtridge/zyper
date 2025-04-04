@@ -144,6 +144,11 @@
     --color-sidebar-ring: var(--sidebar-ring);
 }
 
+@theme {
+    --breakpoint-md: 20rem;
+    --breakpoint-lg: 20rem;
+}
+
 @layer base {
     * {
         @apply border-border outline-ring/50;

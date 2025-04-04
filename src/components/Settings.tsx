@@ -1,11 +1,12 @@
 import { CircleHelp } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
 
-import useSettingsStore from "@/stores/settings";
+import useSettingsStore, { Settings as SettingsType } from "@/stores/settings";
 
+import { Checkbox } from "./ui/checkbox";
 import { Input } from "./ui/input";
 import {
     Select,
@@ -21,6 +22,13 @@ import {
     TooltipTrigger,
 } from "./ui/tooltip";
 
+function generateNewSettings<T extends Partial<SettingsType>>(
+    settings: SettingsType,
+    updates: T
+): SettingsType {
+    return { ...settings, ...updates };
+}
+
 const Settings: React.FC = () => {
     const { theme, themes, setTheme } = useTheme();
     const { t, i18n } = useTranslation();
@@ -32,6 +40,8 @@ const Settings: React.FC = () => {
             state.updateSettings,
         ])
     );
+    const [nextLineShortcut, setNextLineShortcut] = useState<string>();
+    const [prevLineShortcut, setPrevLineShortcut] = useState<string>();
 
     useEffect(() => {
         if (isLoading) {
@@ -41,24 +51,75 @@ const Settings: React.FC = () => {
         }
     }, [isLoading]);
 
+    useEffect(() => {
+        if (!settings) {
+            return;
+        }
+
+        setNextLineShortcut(settings.next_line_key.join("+"));
+        setPrevLineShortcut(settings.prev_line_key.join("+"));
+    }, [settings]);
+
+    const sendUpdateFut = async (settings: SettingsType) => {
+        try {
+            await updateSettings(settings);
+        } catch (error) {
+            const { message } = await import("@tauri-apps/plugin-dialog");
+
+            if (typeof error === "string") {
+                await message(t(error), { kind: "error" });
+            }
+
+            console.error("Uncaught error: ", error);
+        }
+    };
+
+    const nextLineKeyDownHandler = (e: React.KeyboardEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const keys = [];
+
+        if (e.code == "ControlLeft") keys.push("ControlLeft");
+        if (e.code == "ShiftLeft") keys.push("ShiftLeft");
+        if (e.code == "Alt") keys.push("Alt");
+        if (e.code == "Meta") keys.push("Meta");
+
+        if (!["ControlLeft", "ShiftLeft", "Alt", "Meta"].includes(e.code)) {
+            keys.push(e.code);
+        }
+
+        setNextLineShortcut(keys.join("+"));
+    };
+
+    const prevLineKeyDownHandler = (e: React.KeyboardEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const keys = [];
+
+        if (e.code == "ControlLeft") keys.push("ControlLeft");
+        if (e.code == "ShiftLeft") keys.push("ShiftLeft");
+        if (e.code == "Alt") keys.push("Alt");
+        if (e.code == "Meta") keys.push("Meta");
+
+        if (!["ControlLeft", "ShiftLeft", "Alt", "Meta"].includes(e.code)) {
+            keys.push(e.code);
+        }
+
+        setPrevLineShortcut(keys.join("+"));
+    };
+
     if (!settings) {
         return null;
     }
 
     return (
         <TooltipProvider>
-            <section className="h-dvh w-dvw px-2">
-                <div className="grid grid-cols-[1fr_0.3fr] items-center justify-between border-t-2 py-3">
+            <section className="scrollbar h-dvh w-dvw overflow-hidden overflow-y-scroll px-2">
+                <div className="grid grid-cols-[1fr_0.4fr] items-center justify-between border-t-2 py-3">
                     <div className="flex items-center gap-x-0.5">
                         <p>{t("settings.theme")}</p>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <CircleHelp className="h-4 w-4" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-dvw break-words">
-                                {t("settings.themeHint")}
-                            </TooltipContent>
-                        </Tooltip>
                     </div>
 
                     <Select
@@ -80,17 +141,9 @@ const Settings: React.FC = () => {
                     </Select>
                 </div>
 
-                <div className="grid grid-cols-[1fr_0.3fr] items-center justify-between border-t-2 py-3">
+                <div className="grid grid-cols-[1fr_0.4fr] items-center justify-between border-t-2 py-3">
                     <div className="flex items-center gap-x-0.5">
                         <p>{t("settings.language")}</p>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <CircleHelp className="h-4 w-4" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-dvw break-words">
-                                {t("settings.languageHint")}
-                            </TooltipContent>
-                        </Tooltip>
                     </div>
 
                     <Select
@@ -118,7 +171,7 @@ const Settings: React.FC = () => {
                     </Select>
                 </div>
 
-                <div className="grid grid-cols-[1fr_0.3fr] items-center justify-between border-t-2 py-3">
+                <div className="grid grid-cols-[1fr_0.4fr] items-center justify-between border-t-2 py-3">
                     <div className="flex items-center gap-x-0.5">
                         <p>{t("settings.cacheCap")}</p>
                         <Tooltip>
@@ -139,20 +192,18 @@ const Settings: React.FC = () => {
                             e.preventDefault();
                             e.stopPropagation();
 
-                            const newSettings = {
+                            const newSettings = generateNewSettings(settings, {
                                 cache_cap: e.target.valueAsNumber,
-                                cache_ttl: settings.cache_ttl,
-                                detect_pagination: settings.detect_pagination,
-                            };
+                            });
 
                             if (newSettings !== settings) {
-                                updateSettings(newSettings);
+                                sendUpdateFut(newSettings);
                             }
                         }}
                     />
                 </div>
 
-                <div className="grid grid-cols-[1fr_0.3fr] items-center justify-between border-t-2 py-3">
+                <div className="grid grid-cols-[1fr_0.4fr] items-center justify-between border-t-2 py-3">
                     <div className="flex items-center gap-x-0.5">
                         <p>{t("settings.cacheTtl")}</p>
                         <Tooltip>
@@ -173,20 +224,51 @@ const Settings: React.FC = () => {
                             e.preventDefault();
                             e.stopPropagation();
 
-                            const newSettings = {
-                                cache_cap: settings.cache_cap,
+                            const newSettings = generateNewSettings(settings, {
                                 cache_ttl: e.target.valueAsNumber,
-                                detect_pagination: settings.detect_pagination,
-                            };
+                            });
 
                             if (newSettings !== settings) {
-                                updateSettings(newSettings);
+                                sendUpdateFut(newSettings);
                             }
                         }}
                     />
                 </div>
 
-                <div className="grid grid-cols-[1fr_0.3fr] items-center justify-between border-t-2 py-3">
+                {/* here */}
+                <div className="grid grid-cols-[1fr_0.4fr] items-center justify-between border-t-2 py-3">
+                    <div className="flex items-center gap-x-0.5">
+                        <p>{t("settings.interceptInput")}</p>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <CircleHelp className="h-4 w-4" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-dvw break-words">
+                                {t("settings.interceptInputHint")}
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+
+                    <div className="flex w-full justify-center">
+                        <Checkbox
+                            defaultChecked={settings.intercept_input}
+                            onCheckedChange={(checked) => {
+                                if (typeof checked === "boolean") {
+                                    const newSettings = generateNewSettings(
+                                        settings,
+                                        { intercept_input: checked }
+                                    );
+
+                                    if (newSettings !== settings) {
+                                        sendUpdateFut(newSettings);
+                                    }
+                                }
+                            }}
+                        />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-[1fr_0.4fr] items-center justify-between border-t-2 py-3">
                     <div className="flex items-center gap-x-0.5">
                         <p>{t("settings.detectPagination")}</p>
                         <Tooltip>
@@ -206,14 +288,76 @@ const Settings: React.FC = () => {
                             e.preventDefault();
                             e.stopPropagation();
 
-                            const newSettings = {
-                                cache_cap: settings.cache_cap,
-                                cache_ttl: settings.cache_ttl,
+                            const newSettings = generateNewSettings(settings, {
                                 detect_pagination: e.target.value,
-                            };
+                            });
 
                             if (newSettings !== settings) {
-                                updateSettings(newSettings);
+                                sendUpdateFut(newSettings).then(async () => {
+                                    const { invoke } = await import(
+                                        "@tauri-apps/api/core"
+                                    );
+
+                                    invoke("flush_cache");
+                                });
+                            }
+                        }}
+                    />
+                </div>
+
+                <div className="grid grid-cols-[1fr_0.4fr] items-center justify-between border-t-2 py-3">
+                    <div className="flex items-center gap-x-0.5">
+                        <p>{t("settings.nextParagraphShortcut")}</p>
+                    </div>
+
+                    <Input
+                        readOnly
+                        className="w-full"
+                        value={nextLineShortcut}
+                        onKeyDown={nextLineKeyDownHandler}
+                        onBlur={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            if (!nextLineShortcut) {
+                                return;
+                            }
+
+                            const newSettings = generateNewSettings(settings, {
+                                next_line_key: nextLineShortcut.split("+"),
+                            });
+
+                            if (newSettings !== settings) {
+                                sendUpdateFut(newSettings);
+                            }
+                        }}
+                    />
+                </div>
+
+                <div className="grid grid-cols-[1fr_0.4fr] items-center justify-between border-t-2 py-3">
+                    <div className="flex items-center gap-x-0.5">
+                        <p>{t("settings.prevParagraphShortcut")}</p>
+                    </div>
+
+                    <Input
+                        readOnly
+                        className="w-full"
+                        value={prevLineShortcut}
+                        onKeyDown={prevLineKeyDownHandler}
+                        onBlur={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            if (!prevLineShortcut) {
+                                return;
+                            }
+
+                            const newSettings = generateNewSettings(settings, {
+                                prev_line_key: prevLineShortcut.split("+"),
+                            });
+
+                            if (newSettings !== settings) {
+                                sendUpdateFut(newSettings);
                             }
                         }}
                     />

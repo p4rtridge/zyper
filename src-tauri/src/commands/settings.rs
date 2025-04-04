@@ -1,9 +1,10 @@
 use crate::{settings, state::AppState};
+use std::sync::Arc;
 use tauri::{AppHandle, Manager, Runtime, State};
 use tauri_plugin_store::StoreExt;
 
 #[tauri::command]
-pub async fn create_new_window<R>(app: AppHandle<R>) -> Result<&'static str, &'static str>
+pub async fn create_new_window<R>(app: AppHandle<R>) -> Result<&'static str, String>
 where
     R: Runtime,
 {
@@ -12,7 +13,7 @@ where
         "zyper_settings_window",
         tauri::WebviewUrl::App("settings.html".into()),
     )
-    .title("zyper settings")
+    .title("Zyper Settings")
     .drag_and_drop(false)
     .min_inner_size(480f64, 320f64)
     .center()
@@ -20,11 +21,12 @@ where
     {
         Ok(window) => window,
         Err(err) => match err {
-            tauri::Error::WebviewLabelAlreadyExists(..) => return Err("existedWindowError"),
+            tauri::Error::WebviewLabelAlreadyExists(..) => {
+                return Err(String::from("existedWindowError"));
+            }
             err => {
                 eprintln!("[Error] Create window error: {err:?}");
-
-                return Err("internalError");
+                return Err(format!("[BUG] Internal Error: {err}"));
             }
         },
     };
@@ -34,9 +36,9 @@ where
 
 #[tauri::command]
 pub fn get_settings(state: State<'_, AppState>) -> settings::Settings {
-    let settings = state.settings.lock().unwrap();
+    let settings = state.settings.load();
 
-    (*settings).clone()
+    (**settings).clone()
 }
 
 #[tauri::command]
@@ -48,9 +50,9 @@ where
     R: Runtime,
 {
     let state = app.state::<AppState>();
-    let mut settings = state.settings.lock().unwrap();
+    let settings = state.settings.load();
 
-    if (*settings) == payload {
+    if (**settings) == payload {
         return Ok("ok");
     }
 
@@ -64,16 +66,18 @@ where
 
     let store = match app.store("config") {
         Ok(store) => store,
-        Err(err) => return Err(err.to_string()),
+        Err(err) => return Err(format!("[BUG] Internal Error: {err}")),
     };
 
-    *settings = payload;
-
-    let settings = match serde_json::to_value((*settings).clone()) {
-        Ok(settings) => settings,
-        Err(err) => return Err(err.to_string()),
+    let settings = match serde_json::to_value(&payload) {
+        Ok(value) => value,
+        Err(err) => {
+            eprintln!("[Error] Serialize error: {err:?}");
+            return Err(format!("[BUG] Internal Error: {err}"));
+        }
     };
 
+    state.settings.store(Arc::new(payload));
     store.set("settings", settings);
     let _ = store.save();
 
