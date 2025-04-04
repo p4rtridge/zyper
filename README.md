@@ -14,7 +14,7 @@ https://github.com/user-attachments/assets/d0cf297b-df99-417c-94c7-54d985cccb0a
 
 ## Download
 
-Read the [release](https://github.com/p4rtridge/zyper/releases) notes.
+Read the [releases](https://github.com/p4rtridge/zyper/releases) notes.
 
 ## Supported Document Formats
 
