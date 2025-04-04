@@ -4,7 +4,7 @@ use crate::{
 };
 use bytes::{BufMut, BytesMut};
 use serde::Serialize;
-use std::{io::ErrorKind, os::windows::process::CommandExt, path::Path, process::Command};
+use std::{io::ErrorKind, path::Path, process::Command};
 use tokio::fs;
 
 static HASH_SEED: u32 = 564_485; // try google it
@@ -119,6 +119,8 @@ where
 pub fn check_admin_privileges() -> bool {
     #[cfg(target_os = "windows")]
     {
+        use std::os::windows::process::CommandExt;
+
         const CREATE_NO_WINDOWS: u32 = 0x0800_0000;
 
         let output = Command::new("whoami")
