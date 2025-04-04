@@ -1,7 +1,23 @@
-# Tauri + React + Typescript
+# Zyper
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+> [!WARNING]
+> THIS TOOL IS SO FAR A PET PROJECT FOR ME! USE IF YOU LIKE.
 
-## Recommended IDE Setup
+Simple typing tool that helps you type your translations faster by reducing the 'copy-paste' process on macOS, Windows and Linux (X11).
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+## Supported Document Formats
+
+- TXT
+
+## Build From Sources
+
+This application is built on Tauri, Make sure you follow these prerequisites first:
+- [Prerequisties](https://tauri.app/start/prerequisites) to build Tauri applications.
+
+```console
+$ cargo install create-tauri-app --locked
+$ cd src-tauri
+$ cargo tauri build
+```
+
+The installer will be located on release/bundle folder.

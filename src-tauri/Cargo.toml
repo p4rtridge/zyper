@@ -1,7 +1,7 @@
 [package]
 name = "zyper"
 version = "1.0.0"
-description = "Zyper is a typing tool that helps you type your manga translation faster by reducing the \"copy-paste\" process."
+description = "Typing tool"
 authors = ["Partridge <anhduc130703@gmail.com>"]
 license = "MIT"
 edition = "2024"
