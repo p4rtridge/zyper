@@ -58,7 +58,7 @@ const getFile = cache(
     }
 );
 
-const writeToClipboardAndMacro = async (line: string) => {
+const writeToClipboardAndMacro = async (line: TranslationContent) => {
     await invoke("send_key_events", { line });
 };
 

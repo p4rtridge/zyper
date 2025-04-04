@@ -9,6 +9,7 @@
         "dropFiles": "Drop your translation files here.",
         "hintLabel": "Need help?",
         "hintText": "Click here",
+        "commentLabel": "comment",
         "homepage": {
             "greeting": "Hello, Editor!",
             "introduction1": "This app will help you type your translations faster.",
@@ -32,7 +33,11 @@
             "interceptInput": "Intercept keyboard input",
             "interceptInputHint": "Intercept keyboard events before they are delivered to applications. This feature is unstable and may not work as expected. Requires app restart to take effect",
             "nextParagraphShortcut": "Next line shortcut",
-            "prevParagraphShortcut": "Previous line shortcut"
+            "prevParagraphShortcut": "Previous line shortcut",
+            "detectComment": "Comment prefix",
+            "detectCommentHint": "Used for comments in translations. Comment lines will not be sent. Changing this will clear all cached translations",
+            "lineDetect": "Special line prefix",
+            "lineDetectHint": "Used for special lines in translations. Lines marked as comment will not be detected. Unlike comment lines, these are still send. Lines will be detected in ascending order. Changing this will clear all cached translations"
         }
     }
 }

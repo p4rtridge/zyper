@@ -187,4 +187,12 @@
         -moz-appearance: none;
         appearance: none;
     }
+
+    .comment-line-xs {
+        font-size: calc(var(--text-xs) - 0.22rem);
+        line-height: var(
+            --tw-leading,
+            calc(var(--text-xs--line-height) - calc(1 / 0.22))
+        );
+    }
 }

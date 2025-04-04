@@ -34,12 +34,16 @@ const Translation: React.FC = () => {
             return;
         }
 
-        writeToClipboardAndMacro(content[current].content)
+        let currentContent = content[current].content;
+
+        writeToClipboardAndMacro(currentContent)
             .then(() => {
                 let nextCurrent = null;
 
+                let skip = currentContent.is_comment ? 2 : 1;
+
                 if (event === TriggerEvent.NextLine) {
-                    const next = current + 1;
+                    const next = current + skip;
 
                     if (next < content.length) {
                         nextCurrent = next;
@@ -48,7 +52,7 @@ const Translation: React.FC = () => {
                 }
 
                 if (event === TriggerEvent.PrevLine) {
-                    const prev = current - 1;
+                    const prev = current - skip;
 
                     if (prev >= 0) {
                         nextCurrent = prev;
@@ -130,30 +134,47 @@ const Translation: React.FC = () => {
                                     show: { opacity: 1, translateX: 0 },
                                 }}
                                 transition={{ type: "tween" }}>
-                                <td
-                                    className={cn(
-                                        "max-w-11 truncate border-r-[1px] px-1 hover:cursor-default md:max-w-13 md:border-r-2",
-                                        current === index
-                                            ? "opacity-100"
-                                            : "opacity-30"
-                                    )}
-                                    onClick={(e) =>
-                                        changeParagraphHandler(e, index)
-                                    }>
-                                    {line.page ?? "??"}:{line.index}
-                                </td>
-                                <td className="w-full pb-1.5">
-                                    <p
+                                {line.content.is_comment ? (
+                                    <td
                                         className={cn(
-                                            "pl-1 hover:cursor-pointer",
+                                            "comment-line-xs max-w-11 truncate border-r-[1px] pr-1 !align-middle hover:cursor-default md:max-w-13 md:border-r-2",
                                             current === index
-                                                ? "bg-card"
-                                                : "hover:bg-input/50"
+                                                ? "opacity-100"
+                                                : "opacity-30"
+                                        )}>
+                                        {t("commentLabel")}
+                                    </td>
+                                ) : (
+                                    <td
+                                        className={cn(
+                                            "max-w-11 truncate border-r-[1px] px-1 hover:cursor-default md:max-w-13 md:border-r-2",
+                                            current === index
+                                                ? "opacity-100"
+                                                : "opacity-30"
                                         )}
                                         onClick={(e) =>
                                             changeParagraphHandler(e, index)
                                         }>
-                                        {line.content}
+                                        {line.page ?? "??"}:{line.index}
+                                    </td>
+                                )}
+                                <td className="w-full pb-1.5">
+                                    <p
+                                        onClick={(e) =>
+                                            changeParagraphHandler(e, index)
+                                        }
+                                        className={cn(
+                                            "pl-1 hover:cursor-pointer",
+                                            current === index
+                                                ? "bg-card"
+                                                : "hover:bg-input/50",
+                                            line.content.is_comment &&
+                                                "text-foreground/70"
+                                        )}
+                                        style={{
+                                            backgroundColor: `${line.content.color}`,
+                                        }}>
+                                        {line.content.text}
                                     </p>
                                 </td>
                             </motion.tr>

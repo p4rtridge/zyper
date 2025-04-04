@@ -1,7 +1,8 @@
-use crate::state::AppState;
+use crate::{state::AppState, utils};
 use serde::Serialize;
 use std::{collections::VecDeque, sync::Mutex};
 use tauri::{AppHandle, Emitter, Manager};
+use tauri_plugin_dialog::DialogExt;
 
 #[derive(Clone, Debug, Serialize)]
 enum TriggerEvent {
@@ -25,12 +26,20 @@ fn handle_key_release(pressed_keys: &mut VecDeque<rdev::Key>, key: rdev::Key) {
 }
 
 pub fn handle_shortcut(app_handle: AppHandle) {
-    let settings = app_handle.state::<AppState>().settings.clone();
-
     std::thread::spawn(move || {
+        let settings = app_handle.state::<AppState>().settings.clone();
+
         let intercept_input = { settings.load().intercept_input };
 
         if intercept_input {
+            if !utils::check_admin_privileges() {
+                app_handle.dialog()
+                    .message("The intercept input feature requires Administrator privileges. If you dont provide, it might not run as expected")
+                    .kind(tauri_plugin_dialog::MessageDialogKind::Error)
+                    .title("Warning")
+                    .blocking_show();
+            }
+
             let pressed_key = Mutex::new(VecDeque::<rdev::Key>::with_capacity(128));
 
             let err = rdev::grab(move |event| -> Option<rdev::Event> {

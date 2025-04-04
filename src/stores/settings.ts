@@ -8,6 +8,8 @@ export type Settings = {
     intercept_input: boolean;
     next_line_key: string[];
     prev_line_key: string[];
+    detect_comment: string | null;
+    special_line: { [key: string]: string } | null;
 };
 
 type SettingsStore = {
