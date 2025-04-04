@@ -2,6 +2,8 @@ use std::{thread, time::Duration};
 use tauri::{AppHandle, Runtime};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 
+use super::parser;
+
 const CTRL_KEY: rdev::Key = rdev::Key::ControlLeft;
 const V_KEY: rdev::Key = rdev::Key::KeyV;
 
@@ -24,11 +26,15 @@ fn send_key(event: &rdev::EventType) {
 }
 
 #[tauri::command]
-pub fn send_key_events<R>(app: AppHandle<R>, line: String)
+pub fn send_key_events<R>(app: AppHandle<R>, line: parser::Content)
 where
     R: Runtime,
 {
-    app.clipboard().write_text(line).unwrap();
+    if line.is_comment {
+        return;
+    }
+
+    app.clipboard().write_text(line.text).unwrap();
 
     send_key(&rdev::EventType::KeyPress(CTRL_KEY));
     send_key(&rdev::EventType::KeyPress(V_KEY));

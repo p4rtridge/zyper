@@ -12,21 +12,21 @@ const Provider: React.FC<ProviderProps> = ({ children }: ProviderProps) => {
         fetchSettings();
     }, [fetchSettings]);
 
-    useEffect(() => {
-        const contextMenuHandler = (e: MouseEvent) => {
-            e.preventDefault();
+    // useEffect(() => {
+    //     const contextMenuHandler = (e: MouseEvent) => {
+    //         e.preventDefault();
 
-            return false;
-        };
+    //         return false;
+    //     };
 
-        window.addEventListener("contextmenu", contextMenuHandler, {
-            capture: true,
-        });
+    //     window.addEventListener("contextmenu", contextMenuHandler, {
+    //         capture: true,
+    //     });
 
-        return () => {
-            window.removeEventListener("contextmenu", contextMenuHandler);
-        };
-    }, []);
+    //     return () => {
+    //         window.removeEventListener("contextmenu", contextMenuHandler);
+    //     };
+    // }, []);
 
     return (
         <ThemeProvider

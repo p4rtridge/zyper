@@ -1,4 +1,4 @@
-import { CircleHelp } from "lucide-react";
+import { CircleHelp, Minus, Plus } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -21,6 +21,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "./ui/tooltip";
+import { Button } from "./ui/button";
 
 function generateNewSettings<T extends Partial<SettingsType>>(
     settings: SettingsType,
@@ -40,8 +41,10 @@ const Settings: React.FC = () => {
             state.updateSettings,
         ])
     );
-    const [nextLineShortcut, setNextLineShortcut] = useState<string>();
-    const [prevLineShortcut, setPrevLineShortcut] = useState<string>();
+    const [lineDetectPrefix, setLineDetectPrefix] = useState<string>("");
+    const [lineDetectColor, setLineDetectColor] = useState<string>("#000000");
+    const [nextLineShortcut, setNextLineShortcut] = useState<string>("");
+    const [prevLineShortcut, setPrevLineShortcut] = useState<string>("");
 
     useEffect(() => {
         if (isLoading) {
@@ -113,6 +116,31 @@ const Settings: React.FC = () => {
     if (!settings) {
         return null;
     }
+
+    const lineDetectFormHandler = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!lineDetectPrefix || !lineDetectColor) {
+            return;
+        }
+
+        const special_line = settings.special_line ?? {};
+        special_line[lineDetectPrefix] = lineDetectColor;
+
+        const newSettings = generateNewSettings(settings, { special_line });
+
+        if (newSettings !== settings) {
+            sendUpdateFut(newSettings).then(async () => {
+                const { invoke } = await import("@tauri-apps/api/core");
+
+                setLineDetectPrefix("");
+                setLineDetectColor("#000000");
+
+                invoke("flush_cache");
+            });
+        }
+    };
 
     return (
         <TooltipProvider>
@@ -197,7 +225,13 @@ const Settings: React.FC = () => {
                             });
 
                             if (newSettings !== settings) {
-                                sendUpdateFut(newSettings);
+                                sendUpdateFut(newSettings).then(async () => {
+                                    const { invoke } = await import(
+                                        "@tauri-apps/api/core"
+                                    );
+
+                                    invoke("flush_cache");
+                                });
                             }
                         }}
                     />
@@ -303,6 +337,139 @@ const Settings: React.FC = () => {
                             }
                         }}
                     />
+                </div>
+
+                <div className="grid grid-cols-[1fr_0.4fr] items-center justify-between border-t-2 py-3">
+                    <div className="flex items-center gap-x-0.5">
+                        <p>{t("settings.detectComment")}</p>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <CircleHelp className="h-4 w-4" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-dvw break-words">
+                                {t("settings.detectCommentHint")}
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+
+                    <Input
+                        className="w-full"
+                        defaultValue={settings.detect_comment ?? ""}
+                        onBlur={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            const newSettings = generateNewSettings(settings, {
+                                detect_comment: e.target.value ?? null,
+                            });
+
+                            if (newSettings !== settings) {
+                                sendUpdateFut(newSettings).then(async () => {
+                                    const { invoke } = await import(
+                                        "@tauri-apps/api/core"
+                                    );
+
+                                    invoke("flush_cache");
+                                });
+                            }
+                        }}
+                    />
+                </div>
+
+                <div className="space-y-2.5 border-t-2 py-3">
+                    <div className="flex items-center gap-x-0.5">
+                        <p>{t("settings.lineDetect")}</p>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <CircleHelp className="h-4 w-4" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-dvw break-words">
+                                {t("settings.lineDetectHint")}
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+
+                    {!!settings.special_line && (
+                        <div className="space-y-2.5">
+                            {Object.entries(settings.special_line).map(
+                                (line, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex items-center justify-end gap-x-4">
+                                        <Button
+                                            variant={"destructive"}
+                                            className="hover:cursor-pointer"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+
+                                                const special_line =
+                                                    settings.special_line ?? {};
+                                                delete special_line[line[0]];
+
+                                                const newSettings =
+                                                    generateNewSettings(
+                                                        settings,
+                                                        { special_line }
+                                                    );
+
+                                                if (newSettings !== settings) {
+                                                    sendUpdateFut(newSettings);
+                                                }
+                                            }}>
+                                            <Minus />
+                                        </Button>
+                                        <Input
+                                            readOnly
+                                            className="w-12"
+                                            value={line[0]}
+                                        />
+                                        <Input
+                                            disabled
+                                            type="color"
+                                            className="w-12"
+                                            value={line[1]}
+                                        />
+                                    </div>
+                                )
+                            )}
+                        </div>
+                    )}
+
+                    <form
+                        onSubmit={lineDetectFormHandler}
+                        className="flex items-center justify-end gap-x-4">
+                        <Button
+                            type="submit"
+                            variant={"outline"}
+                            className="hover:cursor-pointer">
+                            <Plus />
+                        </Button>
+
+                        <div className="flex items-center gap-x-4">
+                            <Input
+                                className="w-12"
+                                value={lineDetectPrefix}
+                                onChange={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+
+                                    setLineDetectPrefix(e.target.value);
+                                }}
+                            />
+                            <Input
+                                type="color"
+                                className="w-12"
+                                value={lineDetectColor}
+                                onChange={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+
+                                    setLineDetectColor(e.target.value);
+                                }}
+                            />
+                        </div>
+                    </form>
                 </div>
 
                 <div className="grid grid-cols-[1fr_0.4fr] items-center justify-between border-t-2 py-3">

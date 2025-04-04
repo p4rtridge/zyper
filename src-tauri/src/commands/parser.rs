@@ -1,5 +1,5 @@
 use crate::{state::AppState, utils};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tauri::{State, ipc};
 
@@ -9,10 +9,17 @@ pub struct FileResult {
     pub file_name: Option<String>,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Content {
+    pub is_comment: bool,
+    pub color: Option<String>,
+    pub text: String,
+}
+
 #[derive(Clone, Debug, Serialize)]
 pub struct ParsedFile {
     pub page: Option<String>,
-    pub content: String,
+    pub content: Content,
     pub index: u32,
 }
 
@@ -48,7 +55,8 @@ pub async fn process_file(
         return Ok(ipc::Response::new(out));
     }
 
-    let content = utils::read_and_parse_file(path).await?;
+    let settings = state.settings.load();
+    let content = utils::read_and_parse_file(path, &settings).await?;
 
     state.cache.insert(hashed, content).await;
 
@@ -92,7 +100,8 @@ pub async fn get_file(
     let content = if let Some(content) = state.cache.get(&hash).await {
         content
     } else {
-        let content = utils::read_and_parse_file(&path).await?;
+        let settings = state.settings.load();
+        let content = utils::read_and_parse_file(&path, &settings).await?;
 
         state.cache.insert(hash, content.clone()).await;
 

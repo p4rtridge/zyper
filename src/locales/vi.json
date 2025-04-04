@@ -9,6 +9,7 @@
         "dropFiles": "Thả bản dịch của bạn tại đây.",
         "hintLabel": "Cần giúp đỡ?",
         "hintText": "Bấm vào đây",
+        "commentLabel": "chú thích",
         "homepage": {
             "greeting": "Xin chào, Editor!",
             "introduction1": "App này sẽ giúp bạn type bản dịch nhanh hơn.",
@@ -32,7 +33,11 @@
             "interceptInput": "Chặn phím",
             "interceptInputHint": "Chặn nhập từ bàn phím trước khi chúng được gửi đến ứng dụng. Tính năng này không ổn định và có thể không hoạt động như mong đợi. Cần khởi động lại ứng dụng để có hiệu lực.",
             "nextParagraphShortcut": "Phím tắt chuyển dòng kế tiếp",
-            "prevParagraphShortcut": "Phím tắt quay lại dòng trước đó"
+            "prevParagraphShortcut": "Phím tắt quay lại dòng trước đó",
+            "detectComment": "Tiền tố chú thích",
+            "detectCommentHint": "Tiền tố dùng để nhận diện chú thích trong bản dịch. Dòng chú thích sẽ không được gửi. Thay đổi sẽ xóa toàn bộ bản dịch trong bộ nhớ đệm",
+            "lineDetect": "Tiền tố dòng đặc biệt",
+            "lineDetectHint": "Tiền tố dùng để nhận diện dòng đặc biệt trong bản dịch. Dòng chú thích sẽ không nhận diện cái này. Không giống như chú thích, dòng này vẫn sẽ được gửi. Dòng sẽ nhận diện theo thứ tự tăng dần. Thay đổi sẽ xóa toàn bộ bản dịch trong bộ nhớ đệm"
         }
     }
 }

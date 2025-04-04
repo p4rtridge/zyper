@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Settings {
@@ -8,6 +9,8 @@ pub struct Settings {
     pub intercept_input: bool,
     pub next_line_key: Vec<rdev::Key>,
     pub prev_line_key: Vec<rdev::Key>,
+    pub detect_comment: Option<String>,
+    pub special_line: HashMap<String, String>,
 }
 
 impl Default for Settings {
@@ -19,6 +22,8 @@ impl Default for Settings {
             intercept_input: false,
             next_line_key: vec![rdev::Key::Tab],
             prev_line_key: vec![rdev::Key::ShiftLeft, rdev::Key::Tab],
+            detect_comment: None,
+            special_line: HashMap::new(),
         }
     }
 }

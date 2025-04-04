@@ -20,8 +20,15 @@ pub fn run() {
             let store = app.store_builder("config").disable_auto_save().build()?;
 
             let settings = match store.get("settings") {
-                Some(value) => serde_json::from_value::<settings::Settings>(value)?,
                 None => settings::Settings::default(),
+                Some(value) => {
+                    if let Ok(value) = serde_json::from_value::<settings::Settings>(value) {
+                        value
+                    } else {
+                        store.delete("settings");
+                        settings::Settings::default()
+                    }
+                }
             };
 
             let cache = moka::future::Cache::builder()

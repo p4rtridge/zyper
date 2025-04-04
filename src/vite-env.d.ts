@@ -1,10 +1,16 @@
 /// <reference types="vite/client" />
 
 declare global {
+    type TranslationContent = {
+        is_comment: boolean;
+        color: string | null;
+        text: string;
+    };
+
     type ParsedTranslation = {
         page: string | null;
         index: number;
-        content: string;
+        content: TranslationContent;
     };
 
     type TauriDragEvent = {
