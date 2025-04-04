@@ -1,5 +1,7 @@
 # Zyper
 
+![](https://github.com/p4rtridge/zyper/blob/assets/demo.png)
+
 > [!WARNING]
 > THIS TOOL IS SO FAR A PET PROJECT FOR ME! USE IF YOU LIKE.
 
@@ -7,6 +9,7 @@ Simple typing tool that helps you type your translations faster by reducing the 
 
 ## Demo
 
+![](https://github.com/p4rtridge/zyper/blob/assets/demo.mov)
 
 ## Supported Document Formats
 
