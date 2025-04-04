@@ -31,10 +31,10 @@
     "active": true,
     "targets": "all",
     "icon": [
+      "icons/logo.ico",
       "icons/logo32x32.png",
       "icons/logo128x128.png",
-      "icons/logo256x256.png",
-      "icons/logo.ico"
+      "icons/logo256x256.png"
     ],
     "windows": {
       "allowDowngrades": true,
