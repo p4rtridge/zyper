@@ -25,9 +25,7 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 arc-swap = "1.7"
 bytes = "1.10"
-libmimalloc-sys = { version = "0.1.41", features = ["extended"] }
 moka = { version = "0.12", features = ["future"] }
-mimalloc = "0.1.45"
 rdev = { version = "0.5", features = ["serialize", "unstable_grab"] }
 tauri = { version = "2.4", features = [] }
 tauri-plugin-clipboard-manager = "2.2"

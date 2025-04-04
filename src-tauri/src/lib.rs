@@ -9,15 +9,6 @@ mod settings;
 mod state;
 mod utils;
 
-async fn mimalloc_memory_loop() {
-    loop {
-        unsafe {
-            libmimalloc_sys::mi_collect(true);
-        }
-        tokio::time::sleep(Duration::from_secs(30)).await;
-    }
-}
-
 /// Start application
 ///
 /// # Panics
@@ -26,8 +17,6 @@ async fn mimalloc_memory_loop() {
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            tauri::async_runtime::spawn(mimalloc_memory_loop());
-
             let store = app.store_builder("config").disable_auto_save().build()?;
 
             let settings = match store.get("settings") {
