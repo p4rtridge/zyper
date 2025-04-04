@@ -14,8 +14,8 @@ where
         tauri::WebviewUrl::App("settings.html".into()),
     )
     .title("Zyper Settings")
-    .drag_and_drop(false)
     .min_inner_size(480f64, 320f64)
+    .disable_drag_drop_handler()
     .center()
     .build()
     {
