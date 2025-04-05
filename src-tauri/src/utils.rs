@@ -4,7 +4,7 @@ use crate::{
 };
 use bytes::{BufMut, BytesMut};
 use serde::Serialize;
-use std::{io::ErrorKind, path::Path, process::Command};
+use std::{io::ErrorKind, path::Path};
 use tokio::fs;
 
 static HASH_SEED: u32 = 564_485; // try google it
@@ -119,7 +119,7 @@ where
 pub fn check_admin_privileges() -> bool {
     #[cfg(target_os = "windows")]
     {
-        use std::os::windows::process::CommandExt;
+        use std::{os::windows::process::CommandExt, process::Command};
 
         const CREATE_NO_WINDOWS: u32 = 0x0800_0000;
 
@@ -142,6 +142,8 @@ pub fn check_admin_privileges() -> bool {
 
     #[cfg(target_os = "macos")]
     {
+        use std::process::Command;
+
         let output = Command::new("groups").output();
 
         match output {
