@@ -34,38 +34,35 @@ const Translation: React.FC = () => {
             return;
         }
 
-        let currentContent = content[current].content;
+        const currentContent = content[current].content;
 
         writeToClipboardAndMacro(currentContent)
             .then(() => {
-                let nextCurrent = null;
+                let next = event === TriggerEvent.NextLine ? 1 : -1;
 
-                let skip = currentContent.is_comment ? 2 : 1;
+                let nextIndex = current + next;
+                const nextContent = content.at(nextIndex);
 
-                if (event === TriggerEvent.NextLine) {
-                    const next = current + skip;
-
-                    if (next < content.length) {
-                        nextCurrent = next;
-                        setCurrent(next);
-                    }
+                if (!nextContent) {
+                    return;
                 }
 
-                if (event === TriggerEvent.PrevLine) {
-                    const prev = current - skip;
-
-                    if (prev >= 0) {
-                        nextCurrent = prev;
-                        setCurrent(prev);
-                    }
+                if (nextContent.content.is_comment) {
+                    next *= 2;
                 }
 
-                if (nextCurrent) {
-                    lineRefs.current[nextCurrent]?.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                    });
+                nextIndex = current + next;
+
+                if (nextIndex < 0 || nextIndex >= content.length) {
+                    return;
                 }
+
+                setCurrent(nextIndex);
+
+                lineRefs.current[nextIndex]?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
             })
             .catch(async () => {
                 const { message } = await import("@tauri-apps/plugin-dialog");
