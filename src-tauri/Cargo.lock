@@ -5983,6 +5983,7 @@ version = "1.1.0"
 dependencies = [
  "arc-swap",
  "bytes",
+ "libc",
  "moka",
  "rdev",
  "serde",

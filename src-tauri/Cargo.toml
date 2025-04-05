@@ -25,6 +25,7 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 arc-swap = "1.7"
 bytes = "1.10"
+libc = "0.2.171"
 moka = { version = "0.12", features = ["future"] }
 rdev = { version = "0.5", features = ["serialize", "unstable_grab"] }
 tauri = { version = "2.4", features = [] }
